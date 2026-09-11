@@ -1,0 +1,19 @@
+{
+  "documentType": "SOW",
+  "rulesetVersion": "0.1.0",
+  "sourceFile": "contract-03-mixed-severity.md",
+  "note": "Realistic 'mediocre but not egregious' contract — exercises the amber band and the amber/red boundary, which is the hardest calibration case for the model. No insurance clause is present at all (missing-clause case, distinct from the vendor-unfavorable contract's data-sensitivity context).",
+  "expectedFindings": [
+    { "ruleId": "sow-liability-cap", "expectedSeverity": "amber", "why": "Cap exists but vaguely worded ('reasonable amount'), no defined ceiling." },
+    { "ruleId": "sow-indemnification-mutuality", "expectedSeverity": "amber", "why": "Mutual, but broadly worded 'any and all claims' with no scoping to specific triggers." },
+    { "ruleId": "sow-ip-ownership", "expectedSeverity": "amber", "why": "Work product ownership stated but no background IP carve-out or license-back language." },
+    { "ruleId": "sow-payment-terms", "expectedSeverity": "amber", "why": "Net 45 with clear cadence but no late-payment interest term." },
+    { "ruleId": "sow-termination-convenience", "expectedSeverity": "amber", "why": "Mutual termination for convenience, but only 10 days' notice (below the 30-day green threshold)." },
+    { "ruleId": "sow-termination-cause-cure", "expectedSeverity": "amber", "why": "Cure period is only 10 days, shorter than the 15-day amber/green boundary in the rule guidance." },
+    { "ruleId": "sow-confidentiality-survival", "expectedSeverity": "amber", "why": "1-year survival, and silent on trade secrets." },
+    { "ruleId": "sow-governing-law-disputes", "expectedSeverity": "green", "why": "Ontario courts — unfamiliar but not obviously unfavorable jurisdiction for either party." },
+    { "ruleId": "sow-change-order-process", "expectedSeverity": "amber", "why": "Process referenced (email documentation) but no formal approval chain or fee-impact process." },
+    { "ruleId": "sow-acceptance-criteria", "expectedSeverity": "amber", "why": "Review window defined, but standard is subjective ('to Client's satisfaction') rather than objective." },
+    { "ruleId": "sow-insurance", "expectedSeverity": "red", "why": "No insurance requirement at all." }
+  ]
+}

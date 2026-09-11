@@ -1,0 +1,19 @@
+{
+  "documentType": "SOW",
+  "rulesetVersion": "0.1.0",
+  "sourceFile": "contract-02-vendor-unfavorable.md",
+  "note": "Heavily vendor-unfavorable contract — exercises red/critical paths across most rules, plus two rules that should not fire (change-order and insurance are absent from the source text entirely, which itself should surface as missing-clause findings rather than being silently skipped).",
+  "expectedFindings": [
+    { "ruleId": "sow-liability-cap", "expectedSeverity": "red", "why": "Cap tied to a single invoice — unreasonably low." },
+    { "ruleId": "sow-indemnification-mutuality", "expectedSeverity": "critical", "why": "One-sided, unscoped 'any and all claims of any kind' indemnification favoring Vendor." },
+    { "ruleId": "sow-ip-ownership", "expectedSeverity": "critical", "why": "Assigns Vendor's pre-existing tools/frameworks to Client — blocks Vendor reuse across engagements." },
+    { "ruleId": "sow-payment-terms", "expectedSeverity": "critical", "why": "Net 75 and payment contingent on vague 'Client's satisfaction'." },
+    { "ruleId": "sow-termination-convenience", "expectedSeverity": "critical", "why": "No termination-for-convenience right for either party." },
+    { "ruleId": "sow-termination-cause-cure", "expectedSeverity": "critical", "why": "Vendor gets immediate termination on payment default with no cure period; asymmetric with Client's cure-required breach right." },
+    { "ruleId": "sow-confidentiality-survival", "expectedSeverity": "critical", "why": "No survival clause — obligation appears limited to the term of the SOW." },
+    { "ruleId": "sow-governing-law-disputes", "expectedSeverity": "critical", "why": "Exclusive arbitration administered and arbitrator-selected by Vendor, in an unfavorable jurisdiction." },
+    { "ruleId": "sow-change-order-process", "expectedSeverity": "critical", "why": "No change order process defined at all." },
+    { "ruleId": "sow-acceptance-criteria", "expectedSeverity": "critical", "why": "Deemed accepted immediately upon delivery with no review window or standard." },
+    { "ruleId": "sow-insurance", "expectedSeverity": "red", "why": "No insurance requirement despite a data migration engagement implying access to Client data." }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "documentType": "SOW",
+  "rulesetVersion": "0.1.0",
+  "sourceFile": "contract-01-clean.md",
+  "note": "Baseline 'clean' contract — every rule should resolve green. Used to check the analyzer doesn't over-flag well-drafted terms (false positive check).",
+  "expectedFindings": [
+    { "ruleId": "sow-liability-cap", "expectedSeverity": "green" },
+    { "ruleId": "sow-indemnification-mutuality", "expectedSeverity": "green" },
+    { "ruleId": "sow-ip-ownership", "expectedSeverity": "green" },
+    { "ruleId": "sow-payment-terms", "expectedSeverity": "green" },
+    { "ruleId": "sow-termination-convenience", "expectedSeverity": "green" },
+    { "ruleId": "sow-termination-cause-cure", "expectedSeverity": "green" },
+    { "ruleId": "sow-confidentiality-survival", "expectedSeverity": "green" },
+    { "ruleId": "sow-governing-law-disputes", "expectedSeverity": "green" },
+    { "ruleId": "sow-change-order-process", "expectedSeverity": "green" },
+    { "ruleId": "sow-acceptance-criteria", "expectedSeverity": "green" },
+    { "ruleId": "sow-insurance", "expectedSeverity": "green" }
+  ]
+}

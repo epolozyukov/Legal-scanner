@@ -1,0 +1,175 @@
+documentType: SOW
+version: 0.1.0
+description: >
+  Draft ruleset for Statements of Work. Each rule is evaluated against the
+  extracted contract text by the AI analysis step (section 4 of
+  contract-validator-requirements.md). Severity criteria are written as
+  guidance for the model, not exact string matches — the model applies
+  judgment within the described bands.
+
+rules:
+  - id: sow-liability-cap
+    category: Liability
+    description: >
+      Statement of Work should cap total liability at a defined, reasonable
+      amount (typically tied to fees paid under the SOW).
+    severity:
+      green: Liability capped at 12 months' fees or greater, or capped at total SOW value.
+      amber: Liability capped, but below 12 months' fees or vaguely worded (e.g. "reasonable amount").
+      red: Liability cap exists but is unreasonably low (e.g. a single invoice) or excludes key damage types without justification.
+      critical: No liability cap at all — unlimited liability exposure.
+    suggestedFix: >
+      Add a mutual limitation of liability clause capping direct damages at
+      fees paid in the 12 months preceding the claim, consistent with
+      standard MSA terms.
+
+  - id: sow-indemnification-mutuality
+    category: Indemnification
+    description: >
+      Indemnification obligations should be mutual (or clearly justified if
+      one-sided) and scoped to specific triggers (IP infringement, gross
+      negligence, breach of confidentiality).
+    severity:
+      green: Mutual indemnification, clearly scoped triggers.
+      amber: Mutual but broadly worded ("any and all claims") without scoping.
+      red: One-sided indemnification favoring the counterparty with no reciprocal protection.
+      critical: One-sided indemnification with uncapped, unscoped liability ("any and all claims of any kind").
+    suggestedFix: >
+      Make indemnification mutual and scope triggers to IP infringement,
+      confidentiality breach, and gross negligence/willful misconduct.
+
+  - id: sow-ip-ownership
+    category: Intellectual Property
+    description: >
+      Ownership of work product and pre-existing IP (background IP) must be
+      clearly assigned, with each party retaining its own background IP.
+    severity:
+      green: Clear assignment of work product to the receiving party; background IP retained by originating party.
+      amber: Work product ownership stated but background IP carve-out is missing or ambiguous.
+      red: Ownership of work product is ambiguous or silent.
+      critical: Clause assigns ownership of the vendor's pre-existing tools/IP to the client, or vice versa in a way that blocks reuse across other engagements.
+    suggestedFix: >
+      Add a clause assigning deliverables/work product to the client upon
+      full payment, with an explicit background IP carve-out and a license
+      grant for any background IP embedded in deliverables.
+
+  - id: sow-payment-terms
+    category: Commercial
+    description: >
+      Payment terms (net days, invoicing cadence, late payment interest)
+      should be clearly defined and commercially standard.
+    severity:
+      green: Net 30 or better, clear invoicing schedule, standard late-payment interest.
+      amber: Net 45-60, or invoicing cadence loosely defined.
+      red: Net 60+ with no late payment remedy, or payment contingent on vague "client satisfaction" milestones.
+      critical: No payment terms specified, or payment entirely contingent on a third party outside either party's control.
+    suggestedFix: >
+      Define net payment terms (target Net 30), a fixed invoicing cadence
+      tied to milestones or monthly billing, and a late-payment interest
+      rate consistent with company standard terms.
+
+  - id: sow-termination-convenience
+    category: Termination
+    description: >
+      Either party should be able to terminate for convenience with
+      reasonable prior written notice.
+    severity:
+      green: Mutual termination for convenience with 30+ days notice.
+      amber: Mutual termination for convenience with less than 30 days notice.
+      red: Termination for convenience available to only one party.
+      critical: No termination for convenience right for either party (only for-cause termination, effectively locking in the client/vendor).
+    suggestedFix: >
+      Add mutual termination for convenience with at least 30 days' written
+      notice, with payment due for work performed and non-cancellable
+      committed costs up to the termination date.
+
+  - id: sow-termination-cause-cure
+    category: Termination
+    description: >
+      Termination for cause (material breach) should include a defined cure
+      period before termination takes effect.
+    severity:
+      green: Material breach termination with a 30-day cure period, mutual.
+      amber: Cure period shorter than 15 days, or mutual but vaguely defined "material breach".
+      red: No cure period — immediate termination on alleged breach.
+      critical: Immediate termination right granted to only one party with no cure period and no dispute mechanism.
+    suggestedFix: >
+      Add a cure period (target 30 days from written notice) before
+      termination for material breach becomes effective, applied mutually.
+
+  - id: sow-confidentiality-survival
+    category: Confidentiality
+    description: >
+      Confidentiality obligations should survive termination/expiration of
+      the SOW for a defined, reasonable period (or indefinitely for trade
+      secrets).
+    severity:
+      green: Confidentiality survives 3+ years post-termination, indefinite for trade secrets.
+      amber: Survival period of 1-2 years, or silent on trade secrets.
+      red: Survival period under 1 year.
+      critical: No survival clause — confidentiality obligations appear to lapse immediately at termination.
+    suggestedFix: >
+      Add a confidentiality survival clause of at least 3 years
+      post-termination, with an indefinite carve-out for trade secrets.
+
+  - id: sow-governing-law-disputes
+    category: Legal / Governing Law
+    description: >
+      Governing law and dispute resolution mechanism should be identified
+      and in a jurisdiction/forum that is workable for our organization.
+    severity:
+      green: Governing law and venue match our standard contracting jurisdiction, or a mutually neutral, workable jurisdiction.
+      amber: Governing law/venue is in an unfamiliar but not obviously unfavorable jurisdiction.
+      red: Governing law/venue is in a jurisdiction with materially different legal protections or high litigation cost/inconvenience for our side.
+      critical: Governing law/venue clause is missing entirely, or mandates binding arbitration exclusively controlled/administered by the counterparty.
+    suggestedFix: >
+      Specify governing law and venue consistent with company standard
+      contracting terms, or propose a neutral jurisdiction with standard
+      arbitration/dispute escalation steps.
+
+  - id: sow-change-order-process
+    category: Scope Management
+    description: >
+      There should be a defined change order / scope change process
+      requiring written agreement before scope, timeline, or fees change.
+    severity:
+      green: Clear written change order process requiring mutual sign-off before scope/fee changes take effect.
+      amber: Change order process referenced but not detailed (no form, approval chain, or fee-impact process).
+      red: No change order process — scope changes implied to be handled informally.
+      critical: Clause allows one party to unilaterally expand scope or extend timeline without the other's written consent.
+    suggestedFix: >
+      Add a change order process requiring written mutual agreement on
+      scope, timeline, and fee changes before work proceeds.
+
+  - id: sow-acceptance-criteria
+    category: Deliverables
+    description: >
+      Deliverables should have objective acceptance criteria and a defined
+      acceptance/rejection window.
+    severity:
+      green: Objective, measurable acceptance criteria with a defined review/rejection window (e.g. 10 business days).
+      amber: Acceptance criteria present but subjective (e.g. "to client's satisfaction") without an objective standard.
+      red: No acceptance window defined — deliverables deemed accepted or rejected with no clear process.
+      critical: Acceptance is entirely at one party's sole and unreviewable discretion, with payment contingent on that discretion.
+    suggestedFix: >
+      Define objective, measurable acceptance criteria per deliverable and a
+      fixed review window (e.g. 10 business days) after which deliverables
+      are deemed accepted absent written rejection with specific defects
+      cited.
+
+  - id: sow-insurance
+    category: Risk / Insurance
+    description: >
+      SOW should require the vendor to maintain commercially reasonable
+      insurance coverage (general liability, professional liability/E&O,
+      cyber where applicable).
+    severity:
+      green: Insurance requirements specified with reasonable coverage minimums matching engagement risk.
+      amber: Insurance mentioned generically without coverage minimums.
+      red: No insurance requirement despite the engagement involving sensitive data or on-site work.
+      critical: N/A — insurance gaps are rarely "critical" on their own; cap at red.
+    suggestedFix: >
+      Add insurance requirements (general liability, professional
+      liability/E&O, and cyber liability if the engagement involves handling
+      client data) with minimum coverage amounts appropriate to engagement
+      size and risk.
