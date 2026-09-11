@@ -39,6 +39,7 @@ describe("analyzeContract", () => {
           category: rule.category,
           severity: "green" as const,
           quote: "sample clause text",
+          title: `${rule.category} meets guideline`,
           issue: "No issue — clause meets the green criteria.",
           suggestedFix: rule.suggestedFix,
         })),

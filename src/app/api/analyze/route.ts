@@ -60,8 +60,10 @@ export async function POST(request: Request) {
 
   const analysis = await analyzeContract(extractedText, ruleset);
 
+  // Private access: contracts are confidential (section 7) — the file bytes
+  // are never served directly, only referenced from the review record.
   const blob = await put(`contracts/${Date.now()}-${file.name}`, buffer, {
-    access: "public",
+    access: "private",
     contentType: file.type || "application/octet-stream",
   });
 
@@ -86,6 +88,7 @@ export async function POST(request: Request) {
       quote: finding.quote,
       quoteStart: location?.start ?? null,
       quoteEnd: location?.end ?? null,
+      title: finding.title,
       issue: finding.issue,
       suggestedFix: finding.suggestedFix,
     };

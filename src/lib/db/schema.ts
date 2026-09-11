@@ -26,6 +26,7 @@ export const findings = pgTable("findings", {
   quote: text("quote").notNull(),
   quoteStart: integer("quote_start"),
   quoteEnd: integer("quote_end"),
+  title: text("title").notNull(),
   issue: text("issue").notNull(),
   suggestedFix: text("suggested_fix").notNull(),
   status: findingStatusEnum("status").default("pending").notNull(),
