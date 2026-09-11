@@ -45,9 +45,13 @@ export async function POST(request: Request) {
 
   const ruleset = await getRuleset(classification.documentType);
   if (!ruleset) {
+    const message =
+      classification.documentType === "other"
+        ? "This doesn't look like a contract Legal Scanner can review. Right now it only analyzes Statements of Work (SOW) — support for NDAs and MSAs is coming soon."
+        : `This looks like an ${classification.documentType}, but Legal Scanner currently only analyzes Statements of Work (SOW). Support for ${classification.documentType} is coming soon.`;
     return NextResponse.json(
       {
-        error: `No ruleset is available yet for document type "${classification.documentType}".`,
+        error: message,
         documentType: classification.documentType,
       },
       { status: 422 },
