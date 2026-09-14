@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Finding = {
   id: string;
@@ -47,15 +47,44 @@ const CARD_BORDER_COLORS: Record<Finding["severity"], string> = {
 
 export function ReviewSplitView({ review }: { review: Review }) {
   const [findings, setFindings] = useState(review.findings);
+  const [text, setText] = useState(review.extractedText);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const markRefs = useRef(new Map<string, HTMLElement>());
 
-  async function decide(findingId: string, status: "approved" | "dismissed") {
-    const res = await fetch(`/api/reviews/${review.id}/findings/${findingId}`, {
+  useEffect(() => {
+    if (!hoveredId) return;
+    markRefs.current.get(hoveredId)?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [hoveredId]);
+
+  async function decide(finding: Finding, status: "approved" | "dismissed") {
+    const res = await fetch(`/api/reviews/${review.id}/findings/${finding.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
     if (!res.ok) return;
-    setFindings((prev) => prev.map((f) => (f.id === findingId ? { ...f, status } : f)));
+
+    if (status === "approved" && finding.quoteStart !== null && finding.quoteEnd !== null) {
+      const start = finding.quoteStart;
+      const end = finding.quoteEnd;
+      const replacement = finding.suggestedFix;
+      const delta = replacement.length - (end - start);
+
+      setText((prev) => prev.slice(0, start) + replacement + prev.slice(end));
+      setFindings((prev) =>
+        prev.map((f) => {
+          if (f.id === finding.id) return { ...f, status };
+          if (f.quoteStart !== null && f.quoteEnd !== null && f.quoteStart >= end) {
+            return { ...f, quoteStart: f.quoteStart + delta, quoteEnd: f.quoteEnd + delta };
+          }
+          return f;
+        }),
+      );
+    } else {
+      setFindings((prev) => prev.map((f) => (f.id === finding.id ? { ...f, status } : f)));
+    }
+
+    setHoveredId((prev) => (prev === finding.id ? null : prev));
   }
 
   function exportReport() {
@@ -83,8 +112,9 @@ export function ReviewSplitView({ review }: { review: Review }) {
     URL.revokeObjectURL(url);
   }
 
-  const segments = buildHighlightSegments(review.extractedText, findings);
-  const openCount = findings.filter((f) => f.status === "pending").length;
+  const segments = buildHighlightSegments(text, findings);
+  const pendingFindings = findings.filter((f) => f.status === "pending");
+  const openCount = pendingFindings.length;
   const passedCount = findings.filter((f) => f.severity === "green").length;
 
   return (
@@ -115,8 +145,15 @@ export function ReviewSplitView({ review }: { review: Review }) {
             segment.finding ? (
               <mark
                 key={i}
-                className={`rounded px-0.5 ${HIGHLIGHT_COLORS[segment.finding.severity]} ${
-                  segment.finding.status !== "pending" ? "opacity-50" : ""
+                ref={(el) => {
+                  const id = segment.finding!.id;
+                  if (el) markRefs.current.set(id, el);
+                  else markRefs.current.delete(id);
+                }}
+                onMouseEnter={() => setHoveredId(segment.finding!.id)}
+                onMouseLeave={() => setHoveredId((prev) => (prev === segment.finding!.id ? null : prev))}
+                className={`rounded px-0.5 transition-shadow ${HIGHLIGHT_COLORS[segment.finding.severity]} ${
+                  hoveredId === segment.finding.id ? "ring-2 ring-stone-900/60 ring-offset-1" : ""
                 }`}
               >
                 {segment.text}
@@ -129,12 +166,14 @@ export function ReviewSplitView({ review }: { review: Review }) {
 
         <section className="flex w-96 flex-col overflow-y-auto rounded-xl border border-stone-200 bg-white p-4">
           <div className="flex flex-1 flex-col gap-3">
-            {findings.map((finding) => (
+            {pendingFindings.map((finding) => (
               <article
                 key={finding.id}
-                className={`rounded-lg border border-stone-200 border-l-4 bg-white p-4 shadow-sm ${
+                onMouseEnter={() => setHoveredId(finding.id)}
+                onMouseLeave={() => setHoveredId((prev) => (prev === finding.id ? null : prev))}
+                className={`rounded-lg border border-stone-200 border-l-4 bg-white p-4 shadow-sm transition-shadow ${
                   CARD_BORDER_COLORS[finding.severity]
-                } ${finding.status !== "pending" ? "opacity-50" : ""}`}
+                } ${hoveredId === finding.id ? "ring-2 ring-stone-900/40" : ""}`}
               >
                 <span
                   className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${BADGE_COLORS[finding.severity]}`}
@@ -147,15 +186,13 @@ export function ReviewSplitView({ review }: { review: Review }) {
                 </p>
                 <div className="mt-3 flex gap-2">
                   <button
-                    onClick={() => decide(finding.id, "approved")}
-                    disabled={finding.status !== "pending"}
+                    onClick={() => decide(finding, "approved")}
                     className="flex items-center gap-1 rounded-md border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-100 disabled:opacity-40"
                   >
                     <CheckIcon /> Approve
                   </button>
                   <button
-                    onClick={() => decide(finding.id, "dismissed")}
-                    disabled={finding.status !== "pending"}
+                    onClick={() => decide(finding, "dismissed")}
                     className="flex items-center gap-1 rounded-md border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-100 disabled:opacity-40"
                   >
                     <XIcon /> Dismiss
@@ -177,7 +214,7 @@ type Segment = { text: string; finding: Finding | null };
 
 function buildHighlightSegments(sourceText: string, findings: Finding[]): Segment[] {
   const located = findings
-    .filter((f) => f.quoteStart !== null && f.quoteEnd !== null)
+    .filter((f) => f.status === "pending" && f.quoteStart !== null && f.quoteEnd !== null)
     .sort((a, b) => (a.quoteStart ?? 0) - (b.quoteStart ?? 0));
 
   const segments: Segment[] = [];
