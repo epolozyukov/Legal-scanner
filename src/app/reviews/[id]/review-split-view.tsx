@@ -113,7 +113,14 @@ export function ReviewSplitView({ review }: { review: Review }) {
   }
 
   const segments = buildHighlightSegments(text, findings);
-  const pendingFindings = findings.filter((f) => f.status === "pending");
+  const pendingFindings = findings
+    .filter((f) => f.status === "pending")
+    .sort((a, b) => {
+      if (a.quoteStart === null && b.quoteStart === null) return 0;
+      if (a.quoteStart === null) return 1;
+      if (b.quoteStart === null) return -1;
+      return a.quoteStart - b.quoteStart;
+    });
   const openCount = pendingFindings.length;
   const passedCount = findings.filter((f) => f.severity === "green").length;
 
